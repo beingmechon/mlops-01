@@ -1,0 +1,34 @@
+raw_data:
+  type: pandas.CSVDataset
+  filepath: data/01_raw/churn_data.csv
+
+preprocessed_data:
+  type: pandas.CSVDataset
+  filepath: data/02_intermediate/preprocessed_data.csv
+
+features:
+  type: pandas.CSVDataset
+  filepath: data/03_primary/features.csv
+
+X_train:
+  type: pandas.ParquetDataset
+  filepath: data/04_feature/X_train.parquet
+
+X_test:
+  type: pandas.ParquetDataset
+  filepath: data/04_feature/X_test.parquet
+
+y_train:
+  type: pandas.ParquetDataset
+  filepath: data/04_feature/y_train.parquet
+
+y_test:
+  type: pandas.ParquetDataset
+  filepath: data/04_feature/y_test.parquet
+
+model:
+  type: pickle.PickleDataset
+  filepath: data/06_models/model.pkl
+
+accuracy:
+  type: MemoryDataset

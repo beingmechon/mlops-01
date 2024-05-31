@@ -1,0 +1,5 @@
+project_name: 'Customer Churn Prediction'
+project_version: '0.1'
+package_name: 'customer_churn'
+hooks:
+  - kedro.extras.hooks.DatasetHooks
