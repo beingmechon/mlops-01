@@ -6,17 +6,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix, roc_auc_score, roc_curve
 from kedro.io import DataCatalog
 
-def split_data(data: pd.DataFrame):
-    X = data.drop('Churn', axis=1)
-    y = data['Churn']
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    y_train = y_train.to_frame().reset_index()
-    y_test = y_test.to_frame().reset_index()
-
-    return X_train, X_test, y_train, y_test
 
 def train_model(model, training_x, training_y, testing_x, testing_y, cols, cf='coefficients', catalog: DataCatalog = None):
-    # training_y.squeeze(axis=0)
+    training_y.squeeze(axis=0)
     model.fit(training_x, training_y)
     predictions = model.predict(testing_x)
     probabilities = model.predict_proba(testing_x)[:, 1]
