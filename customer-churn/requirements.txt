@@ -15,3 +15,6 @@ imbalanced-learn
 eli5
 pdpbox
 shap
+seaborn
+pyarrow
+fastparquet

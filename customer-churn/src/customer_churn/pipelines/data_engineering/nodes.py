@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 # def preprocess_data(raw_data: pd.DataFrame) -> pd.DataFrame:
 #     print(type(raw_data))
@@ -10,7 +11,7 @@ import pandas as pd
 def preprocess_data(raw_data: pd.DataFrame) -> pd.DataFrame:
     raw_data.drop(["customerID"], inplace = True, axis = 1)
     raw_data.TotalCharges = raw_data.TotalCharges.replace(" ",np.nan)
-    raw_data.TotalCharges.fillna(0, inplace = True)
+    raw_data.TotalCharges = raw_data.TotalCharges.fillna(0, inplace = True)
     raw_data.TotalCharges = raw_data.TotalCharges.astype(float)
     
     cols1 = ['Partner', 'Dependents', 'PaperlessBilling', 'Churn', 'PhoneService']
