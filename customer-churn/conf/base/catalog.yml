@@ -51,7 +51,13 @@ param_grids:
     #   criterion: ["entropy"]
 
 training_results:
-  type: MemoryDataset
+  # type: MemoryDataset
+  type: tracking.JSONDataset
+  filepath: data/08_reporting/training_results.json
+  versioned: true
+  # save_args:
+  #   orient: "records"
+  #   lines: True
 
 evaluation_metrics:
   type: MemoryDataset

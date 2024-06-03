@@ -84,18 +84,16 @@ def train_model(training_x, training_y, testing_x, testing_y, param_grid=None, m
     plt.title('Feature Importances')
     plt.xticks(rotation=90)
 
+    res = {"conf_matrix": conf_matrix.tolist(),
+            "roc_auc": model_roc_auc,
+            "classification_report": classification_rep,
+            "accuracy": accuracy
+        }
+    
+    # result = pd.DataFrame(data=res)
+
     # Return metrics and model
-    return best_model, \
-    {
-        "model": best_model,
-        "predictions": predictions,
-        "probabilities": probabilities,
-        "coef_sumry": coef_sumry if cf == "features" else None,
-        "conf_matrix": conf_matrix,
-        "roc_auc": model_roc_auc,
-        "classification_report": classification_rep,
-        "accuracy": accuracy
-    }, fig
+    return best_model, res, fig
 
 
 # def evaluate_model(metrics: dict):
