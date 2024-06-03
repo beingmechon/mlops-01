@@ -2,33 +2,49 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GridSearchCV, train_test_split 
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix, roc_auc_score, roc_curve
 from kedro.io import DataCatalog
 
 
-def train_model(model, training_x, training_y, testing_x, testing_y, cols, cf='coefficients', catalog: DataCatalog = None):
-    training_y.squeeze(axis=0)
-    model.fit(training_x, training_y)
-    predictions = model.predict(testing_x)
-    probabilities = model.predict_proba(testing_x)[:, 1]
-    
-    if cf == "coefficients":
-        coefficients = pd.DataFrame(model.coef_.ravel())
-    elif cf == "features":
-        coefficients = pd.DataFrame(model.feature_importances_)
-        
-    column_df = pd.DataFrame(cols)
-    coef_sumry = pd.merge(coefficients, column_df, left_index=True, right_index=True, how="left")
-    coef_sumry.columns = ["coefficients", "features"]
-    coef_sumry = coef_sumry.sort_values(by="coefficients", ascending=False)
+def split_data(data: pd.DataFrame):
+    X = data.drop('Churn', axis=1)
+    y = data['Churn']
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    y_train = y_train.to_frame()
+    y_test = y_test.to_frame()
 
-    # Print and store metrics
+    return X_train, X_test, y_train, y_test
+
+
+def train_model(model, training_x, training_y, testing_x, testing_y, cols, param_grid=None, cf='coefficients', catalog: DataCatalog = None):
+    print(training_x.shape, type(training_x))
+    print(training_y.shape, type(training_y))
+    print(training_y)
+
+    if param_grid:
+        rf_model = RandomForestClassifier()
+        grid = GridSearchCV(estimator=rf_model, param_grid=param_grid, n_jobs=-1, cv=3, verbose=1, scoring="roc_auc")
+        grid.fit(training_x, training_y)
+        best_model = grid.best_estimator_
+    else:
+        best_model = model
+    
+    # Train the best model
+    best_model.fit(training_x, training_y)
+    
+    # Make predictions
+    predictions = best_model.predict(testing_x)
+    probabilities = best_model.predict_proba(testing_x)[:, 1]
+    
+    # Calculate evaluation metrics
     classification_rep = classification_report(testing_y, predictions)
     accuracy = accuracy_score(testing_y, predictions)
     conf_matrix = confusion_matrix(testing_y, predictions)
     model_roc_auc = roc_auc_score(testing_y, probabilities)
     
+    # Print and store metrics
     print("\n Classification report : \n", classification_rep)
     print("Accuracy   Score : ", accuracy)
     print("Area under curve : ", model_roc_auc, "\n")
@@ -54,10 +70,14 @@ def train_model(model, training_x, training_y, testing_x, testing_y, cols, cf='c
     plt.legend(loc="lower right")
     
     # Feature importances plot
-    plt.subplot(212)
-    sns.barplot(x=coef_sumry["features"], y=coef_sumry["coefficients"])
-    plt.title('Feature Importances')
-    plt.xticks(rotation="vertical")
+    if cf == "features":
+        coef_sumry = pd.DataFrame(best_model.feature_importances_, columns=["coefficients"])
+        coef_sumry["features"] = cols
+        coef_sumry = coef_sumry.sort_values(by="coefficients", ascending=False)
+        plt.subplot(212)
+        sns.barplot(x=coef_sumry["features"], y=coef_sumry["coefficients"])
+        plt.title('Feature Importances')
+        plt.xticks(rotation="vertical")
     
     # Save plots using Kedro's DataCatalog
     if catalog:
@@ -68,15 +88,16 @@ def train_model(model, training_x, training_y, testing_x, testing_y, cols, cf='c
         plt.show()
 
     return {
-        "model": model,
+        "model": best_model,
         "predictions": predictions,
         "probabilities": probabilities,
-        "coef_sumry": coef_sumry,
+        "coef_sumry": coef_sumry if cf == "features" else None,
         "conf_matrix": conf_matrix,
         "roc_auc": model_roc_auc,
         "classification_report": classification_rep,
         "accuracy": accuracy
     }
+
 
 def evaluate_model(metrics: dict):
     for key, value in metrics.items():

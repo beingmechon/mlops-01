@@ -19,7 +19,7 @@ from typing import Dict
 from kedro.pipeline import Pipeline
 from customer_churn.pipelines.data_engineering import pipeline as de
 from customer_churn.pipelines.feature_engineering import pipeline as fe
-from customer_churn.pipelines.param_tuning import pipeline as pt
+# from customer_churn.pipelines.param_tuning import pipeline as pt
 from customer_churn.pipelines.modeling import pipeline as model
 
 def register_pipelines() -> Dict[str, Pipeline]:
@@ -31,16 +31,16 @@ def register_pipelines() -> Dict[str, Pipeline]:
     # Register individual pipelines
     data_engineering_pipeline = de.create_pipeline()
     feature_engineering_pipeline = fe.create_pipeline()
-    param_tuning_pipeline = pt.create_pipeline()
+    # param_tuning_pipeline = pt.create_pipeline()
     modeling_pipeline = model.create_pipeline()
 
     # Combine all pipelines
     pipelines = {
         "de": data_engineering_pipeline,
         "fe": feature_engineering_pipeline,
-        "pt": param_tuning_pipeline,
+        # "pt": param_tuning_pipeline,
         "model": modeling_pipeline,
-        "__default__": data_engineering_pipeline + feature_engineering_pipeline + param_tuning_pipeline + modeling_pipeline
+        "__default__": data_engineering_pipeline + feature_engineering_pipeline + modeling_pipeline
     }
     
     return pipelines

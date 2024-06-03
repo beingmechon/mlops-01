@@ -5,15 +5,6 @@ from kedro.io import DataCatalog
 from sklearn.model_selection import train_test_split
 import pandas as pd
 
-def split_data(data: pd.DataFrame):
-    X = data.drop('Churn', axis=1)
-    y = data['Churn']
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    y_train = y_train.to_frame().reset_index()
-    y_test = y_test.to_frame().reset_index()
-
-    return X_train, X_test, y_train, y_test
-
 
 def get_best_fitting(X, y, params, scoring="f1"): # roc_auc
     # y.squeeze(axis=0)
