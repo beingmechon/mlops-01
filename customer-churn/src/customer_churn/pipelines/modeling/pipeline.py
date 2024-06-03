@@ -1,5 +1,5 @@
 from kedro.pipeline import Pipeline, node
-from .nodes import train_model, evaluate_model, split_data
+from .nodes import train_model, split_data #, evaluate_model
 
 def create_pipeline(**kwargs) -> Pipeline:
     return Pipeline(
@@ -13,14 +13,15 @@ def create_pipeline(**kwargs) -> Pipeline:
             node(
                 func=train_model,
                 inputs=["X_train", "y_train", "X_test", "y_test", "param_grids"], # "params:cf"
-                outputs="training_results",
+                # outputs="training_results",
+                outputs=["model", "training_results", "reporting_image"],
                 name="train_model_node"
             ),
-            node(
-                func=evaluate_model,
-                inputs="training_results",
-                outputs="evaluation_metrics",
-                name="evaluate_model_node"
-            )
+            # node(
+            #     func=evaluate_model,
+            #     inputs="training_results",
+            #     outputs="evaluation_metrics",
+            #     name="evaluate_model_node"
+            # )
         ]
     )

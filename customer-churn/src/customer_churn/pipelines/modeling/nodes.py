@@ -19,9 +19,8 @@ def split_data(data: pd.DataFrame):
 
 
 def train_model(training_x, training_y, testing_x, testing_y, param_grid=None, model=None, cols=None, cf="features", catalog: DataCatalog = None):
-    print(training_x.shape, type(training_x))
-    print(training_y.shape, type(training_y))
-    # print(training_y)
+    training_y = training_y.values.ravel() if isinstance(training_y, pd.DataFrame) else training_y.ravel()
+    testing_y = testing_y.values.ravel() if isinstance(testing_y, pd.DataFrame) else testing_y.ravel()
 
     if param_grid:
         rf_model = RandomForestClassifier()
@@ -31,49 +30,46 @@ def train_model(training_x, training_y, testing_x, testing_y, param_grid=None, m
     else:
         best_model = model
 
-    # Train the best model
     best_model.fit(training_x, training_y)
     
-    # Make predictions
     predictions = best_model.predict(testing_x)
     probabilities = best_model.predict_proba(testing_x)[:, 1]
 
     if cf == "coefficients":
-        coefficients = pd.DataFrame(best_model.coef_.ravel())
+        try:
+            coefficients = pd.DataFrame(best_model.coef_.ravel())
+        except AttributeError:
+            raise ValueError("The model does not have coefficients. Set `cf` to 'features'.")
     elif cf == "features":
-        coefficients = pd.DataFrame(best_model.feature_importances_)
-
-    cols = training_x.columns
-    column_df = pd.DataFrame(cols)
-    coef_sumry = (pd.merge(coefficients,column_df,left_index= True,
-                              right_index= True, how = "left"))
-    coef_sumry.columns = ["coefficients","features"]
-    coef_sumry = coef_sumry.sort_values(by = "coefficients",ascending = False)
-
+        coefficients = pd.DataFrame(best_model.feature_importances_, columns=["coefficients"])
     
-    # Calculate evaluation metrics
+    cols = training_x.columns
+    column_df = pd.DataFrame(cols, columns=["features"])
+    coef_sumry = pd.concat([coefficients, column_df], axis=1)
+    coef_sumry = coef_sumry.sort_values(by="coefficients", ascending=False)
+
     classification_rep = classification_report(testing_y, predictions)
     accuracy = accuracy_score(testing_y, predictions)
     conf_matrix = confusion_matrix(testing_y, predictions)
     model_roc_auc = roc_auc_score(testing_y, probabilities)
     
-    # Print and store metrics
-    print("\n Classification report : \n", classification_rep)
-    print("Accuracy   Score : ", accuracy)
-    print("Area under curve : ", model_roc_auc, "\n")
+    # Print metrics
+    print("\nClassification report:\n", classification_rep)
+    print("Accuracy Score:", accuracy)
+    print("Area under curve:", model_roc_auc, "\n")
     
-    # Confusion matrix plot
-    plt.figure(figsize=(12, 12))
+    # Plot confusion matrix
+    fig = plt.figure(figsize=(12, 12))
     plt.subplot(221)
-    sns.heatmap(conf_matrix, fmt="d", annot=True, cmap='Blues')
+    sns.heatmap(conf_matrix, annot=True, fmt="d", cmap='Blues')
     plt.title('Confusion Matrix')
     plt.ylabel('True Values')
     plt.xlabel('Predicted Values')
     
-    # ROC AUC plot
+    # Plot ROC curve
     fpr, tpr, thresholds = roc_curve(testing_y, probabilities)
     plt.subplot(222)
-    plt.plot(fpr, tpr, color='darkorange', lw=1, label="AUC : %.3f" % model_roc_auc)
+    plt.plot(fpr, tpr, color='darkorange', lw=2, label="AUC: %.3f" % model_roc_auc)
     plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
@@ -82,21 +78,15 @@ def train_model(training_x, training_y, testing_x, testing_y, param_grid=None, m
     plt.title('Receiver Operating Characteristic')
     plt.legend(loc="lower right")
     
-    # Feature importances plot
+    # Plot feature importances
     plt.subplot(212)
-    sns.barplot(x = coef_sumry["features"] ,y = coef_sumry["coefficients"])
+    sns.barplot(x="features", y="coefficients", data=coef_sumry)
     plt.title('Feature Importances')
-    plt.xticks(rotation="vertical")
-    
-    # Save plots using Kedro's DataCatalog
-    if catalog:
-        fig_path = catalog.get_save_path("churn_prediction_plots")
-        plt.savefig(fig_path)
-        plt.close()
-    else:
-        plt.show()
+    plt.xticks(rotation=90)
 
-    return {
+    # Return metrics and model
+    return best_model, \
+    {
         "model": best_model,
         "predictions": predictions,
         "probabilities": probabilities,
@@ -105,16 +95,16 @@ def train_model(training_x, training_y, testing_x, testing_y, param_grid=None, m
         "roc_auc": model_roc_auc,
         "classification_report": classification_rep,
         "accuracy": accuracy
-    }
+    }, fig
 
 
-def evaluate_model(metrics: dict):
-    for key, value in metrics.items():
-        if isinstance(value, (float, str)):
-            print(f"{key}: {value}")
-        elif isinstance(value, pd.DataFrame):
-            print(f"\n{key}:\n", value)
-        else:
-            print(f"\n{key}:\n", value)
+# def evaluate_model(metrics: dict):
+#     for key, value in metrics.items():
+#         if isinstance(value, (float, str)):
+#             print(f"{key}: {value}")
+#         elif isinstance(value, pd.DataFrame):
+#             print(f"\n{key}:\n", value)
+#         else:
+#             print(f"\n{key}:\n", value)
     
-    return metrics
+#     return metrics

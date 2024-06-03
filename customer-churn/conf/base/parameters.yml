@@ -5,5 +5,4 @@ model:
   max_depth: 10
   criterion: "entropy"
 
-# columns: 
 cf: "features"

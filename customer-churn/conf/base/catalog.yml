@@ -55,3 +55,8 @@ training_results:
 
 evaluation_metrics:
   type: MemoryDataset
+
+reporting_image:
+  type: matplotlib.MatplotlibWriter
+  filepath: data/08_reporting/training_result.png
+  versioned: true
