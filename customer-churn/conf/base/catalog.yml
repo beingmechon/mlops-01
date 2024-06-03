@@ -59,7 +59,17 @@ training_results:
   #   orient: "records"
   #   lines: True
 
-reporting_image:
+training_image:
   type: matplotlib.MatplotlibWriter
   filepath: data/07_training_output/training_result.png
+  versioned: true
+
+testing_results:
+  type: tracking.JSONDataset
+  filepath: data/08_testing_output/training_results.json
+  versioned: true
+
+testing_image:
+  type: matplotlib.MatplotlibWriter
+  filepath: data/08_testing_output/training_result.png
   versioned: true
