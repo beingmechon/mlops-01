@@ -1,0 +1,37 @@
+{
+  "raw_data": {
+    "rows": 7043,
+    "columns": 21,
+    "file_size": 977499
+  },
+  "preprocessed_data": {
+    "rows": 7043,
+    "columns": 24,
+    "file_size": 553121
+  },
+  "features": {
+    "rows": 7043,
+    "columns": 25,
+    "file_size": 620219
+  },
+  "X_train": {
+    "rows": 5634,
+    "columns": 24,
+    "file_size": 117428
+  },
+  "X_test": {
+    "rows": 1409,
+    "columns": 24,
+    "file_size": 44687
+  },
+  "y_train": {
+    "rows": 5634,
+    "columns": 1,
+    "file_size": 34782
+  },
+  "y_test": {
+    "rows": 1409,
+    "columns": 1,
+    "file_size": 10113
+  }
+}

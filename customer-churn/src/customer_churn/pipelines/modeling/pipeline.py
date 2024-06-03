@@ -12,7 +12,7 @@ def create_pipeline(**kwargs) -> Pipeline:
             ),
             node(
                 func=train_model,
-                inputs=["model", "X_train", "y_train", "X_test", "y_test", "params:columns", "param_grids", "params:cf"],
+                inputs=["X_train", "y_train", "X_test", "y_test", "param_grids"], # "params:cf"
                 outputs="training_results",
                 name="train_model_node"
             ),

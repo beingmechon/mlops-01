@@ -18,10 +18,10 @@ def split_data(data: pd.DataFrame):
     return X_train, X_test, y_train, y_test
 
 
-def train_model(model, training_x, training_y, testing_x, testing_y, cols, param_grid=None, cf='coefficients', catalog: DataCatalog = None):
+def train_model(training_x, training_y, testing_x, testing_y, param_grid=None, model=None, cols=None, cf="features", catalog: DataCatalog = None):
     print(training_x.shape, type(training_x))
     print(training_y.shape, type(training_y))
-    print(training_y)
+    # print(training_y)
 
     if param_grid:
         rf_model = RandomForestClassifier()
@@ -30,13 +30,26 @@ def train_model(model, training_x, training_y, testing_x, testing_y, cols, param
         best_model = grid.best_estimator_
     else:
         best_model = model
-    
+
     # Train the best model
     best_model.fit(training_x, training_y)
     
     # Make predictions
     predictions = best_model.predict(testing_x)
     probabilities = best_model.predict_proba(testing_x)[:, 1]
+
+    if cf == "coefficients":
+        coefficients = pd.DataFrame(best_model.coef_.ravel())
+    elif cf == "features":
+        coefficients = pd.DataFrame(best_model.feature_importances_)
+
+    cols = training_x.columns
+    column_df = pd.DataFrame(cols)
+    coef_sumry = (pd.merge(coefficients,column_df,left_index= True,
+                              right_index= True, how = "left"))
+    coef_sumry.columns = ["coefficients","features"]
+    coef_sumry = coef_sumry.sort_values(by = "coefficients",ascending = False)
+
     
     # Calculate evaluation metrics
     classification_rep = classification_report(testing_y, predictions)
@@ -70,14 +83,10 @@ def train_model(model, training_x, training_y, testing_x, testing_y, cols, param
     plt.legend(loc="lower right")
     
     # Feature importances plot
-    if cf == "features":
-        coef_sumry = pd.DataFrame(best_model.feature_importances_, columns=["coefficients"])
-        coef_sumry["features"] = cols
-        coef_sumry = coef_sumry.sort_values(by="coefficients", ascending=False)
-        plt.subplot(212)
-        sns.barplot(x=coef_sumry["features"], y=coef_sumry["coefficients"])
-        plt.title('Feature Importances')
-        plt.xticks(rotation="vertical")
+    plt.subplot(212)
+    sns.barplot(x = coef_sumry["features"] ,y = coef_sumry["coefficients"])
+    plt.title('Feature Importances')
+    plt.xticks(rotation="vertical")
     
     # Save plots using Kedro's DataCatalog
     if catalog:
