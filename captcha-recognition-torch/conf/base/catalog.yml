@@ -1,0 +1,11 @@
+raw_data:
+  type: captcha-recognition-torch.ZipFileDataSet
+  file_path: data/01_raw/archive.zip
+
+intermediate_data:
+  type: string
+  default: data/02_intermediate/
+  
+primary_data:
+  type: string
+  default: data/03_primary/

@@ -7,3 +7,5 @@ weight_decay : 1e-3
 patience : 5
 epochs : 1
 clip_norm : 5
+split_ratio: 0.8
+random_seed: 42
