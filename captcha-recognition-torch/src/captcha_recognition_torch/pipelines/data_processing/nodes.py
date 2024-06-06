@@ -8,6 +8,7 @@ def extract_zip(zip_file, dest_dir):
     """
     Extracts a zip file to the given destination directory.
     """
+    print(zip_file)
     print("Extracting {} to {}".format(zip_file, dest_dir))
     with zipfile.ZipFile(zip_file, 'r') as zip_ref:
         zip_ref.extractall(dest_dir)
@@ -19,7 +20,8 @@ def split_data(source_folder, destination, split_ratio, random_seed):
     """
     random.seed(random_seed)
     print("Splitting data into train and validation sets...")
-    
+
+    source_folder = os.path.join(source_folder, "archive")
     all_files = os.listdir(source_folder)
     random.shuffle(all_files)
     num_train = int(len(all_files) * split_ratio)
