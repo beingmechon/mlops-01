@@ -4,15 +4,17 @@ import shutil
 import zipfile
 from tqdm import tqdm
 
-def extract_zip(zip_file, dest_dir):
+def extract_zip(zip_file, extract_to):
     """
     Extracts a zip file to the given destination directory.
     """
     print(zip_file)
-    print("Extracting {} to {}".format(zip_file, dest_dir))
+    print("Extracting {} to {}".format(zip_file, extract_to))
     with zipfile.ZipFile(zip_file, 'r') as zip_ref:
-        zip_ref.extractall(dest_dir)
+        zip_ref.extractall(extract_to)
     print("Extraction completed.")
+
+    return extract_to
 
 def split_data(source_folder, destination, split_ratio, random_seed):
     """
@@ -29,22 +31,24 @@ def split_data(source_folder, destination, split_ratio, random_seed):
     val_files = all_files[num_train:]
 
     train_folder = os.path.join(destination, "train")
-    val_folder = os.path.join(destination, "val")
+    test_folder = os.path.join(destination, "test")
 
     if os.path.exists(train_folder):
         shutil.rmtree(train_folder)
         print(f"Previous train folder {train_folder} has been removed.")
-    if os.path.exists(val_folder):
-        shutil.rmtree(val_folder)
-        print(f"Previous validation folder {val_folder} has been removed.")
+    if os.path.exists(test_folder):
+        shutil.rmtree(test_folder)
+        print(f"Previous validation folder {test_folder} has been removed.")
  
     os.makedirs(train_folder)
-    os.makedirs(val_folder)
+    os.makedirs(test_folder)
 
     for file in tqdm(train_files, desc="Copying train data"):
         shutil.copy(os.path.join(source_folder, file), os.path.join(train_folder, file))
 
     for file in tqdm(val_files, desc="Copying validation data"):
-        shutil.copy(os.path.join(source_folder, file), os.path.join(val_folder, file))
+        shutil.copy(os.path.join(source_folder, file), os.path.join(test_folder, file))
 
     print("Data splitting completed.")
+
+    return train_folder, test_folder

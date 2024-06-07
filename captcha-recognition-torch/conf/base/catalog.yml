@@ -2,10 +2,36 @@ raw_data:
   type: MemoryDataset
   data: ./data/01_raw/archive.zip
 
-dest_dir:
+extract_to:
   type: MemoryDataset
-  data: ./data/02_intermediate
+  data: ./data/02_intermediate/
+
+train_folder:
+  type: MemoryDataset
+  data: ./data/03_primary/train
+  
+test_folder:
+  type: MemoryDataset
+  data: ./data/03_primary/test
 
 primary_data:
   type: MemoryDataset
   data: ./data/03_primary/
+
+train_dataloader:
+  type: MemoryDataset
+
+test_dataloader:
+  type: MemoryDataset
+
+trained_model:
+    type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
+    dataset:
+      type: pickle.PickleDataset
+      filepath: data/06_models/trained_model.pkl
+      versioned: True
+
+result_json:
+  type: pandas.JSONDataset
+  filepath: data/07_model_output/result_json.json
+
