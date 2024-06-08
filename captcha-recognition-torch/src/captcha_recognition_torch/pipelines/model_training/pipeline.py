@@ -1,5 +1,5 @@
 from kedro.pipeline import Pipeline, node
-from .nodes import train_model, evaluate_model
+from .nodes import train_model
 
 def create_pipeline(**kwargs) -> Pipeline:
     return Pipeline([
@@ -17,15 +17,5 @@ def create_pipeline(**kwargs) -> Pipeline:
                     "params:clip_norm",],
             outputs="trained_model",
             name="train_model_node"
-        ), 
-        node(
-            func=evaluate_model,
-            inputs=[ "test_dataloader", 
-                    "trained_model", 
-                    "params:hidden_size",
-                    "params:drop_out",
-                    "params:idx_to_char"],
-            outputs=["result_json"],
-            name="evaluate_model_node"
         )
     ])

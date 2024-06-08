@@ -25,13 +25,14 @@ test_dataloader:
   type: MemoryDataset
 
 trained_model:
-    type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
-    dataset:
-      type: pickle.PickleDataset
-      filepath: data/06_models/trained_model.pkl
-      versioned: True
+  # type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
+  # dataset:
+  type: pickle.PickleDataset
+  filepath: data/06_models/trained_model.pkl
+  versioned: True
+  backend: pickle
 
 result_json:
-  type: pandas.JSONDataset
+  type: text.TextDataset
   filepath: data/07_model_output/result_json.json
-
+  veriosned: True
