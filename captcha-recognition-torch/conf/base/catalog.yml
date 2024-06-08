@@ -35,4 +35,4 @@ trained_model:
 result_json:
   type: text.TextDataset
   filepath: data/07_model_output/result_json.json
-  veriosned: True
+  versioned: True
