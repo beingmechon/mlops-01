@@ -37,4 +37,6 @@ def evaluate_model(test_loader, trained_model, idx_to_char):
     parsed = loads(result_json)
     result = dumps(parsed, indent=4)
 
+    mlflow.log_artifact(io.BytesIO(result.encode('utf-8')), "results.json")
+
     return result
