@@ -33,7 +33,7 @@ def remove_duplicates(text):
     return "".join(letters)
 
 
-def correct_prediction(word):
+def correct_predictions(word):
     parts = word.split("-")
     parts = [remove_duplicates(part) for part in parts]
     corrected_word = "".join(parts)

@@ -8,7 +8,7 @@ def create_pipeline(**kwargs) -> Pipeline:
             inputs=["test_dataloader", 
                     "trained_model",
                     "params:idx_to_char"],
-            outputs="result_json",
+            outputs=["result_json", "test_metrics"],
             name="evaluate_model_node"
         )
     ])

@@ -36,3 +36,8 @@ result_json:
   type: text.TextDataset
   filepath: data/07_model_output/result_json.json
   versioned: True
+
+test_metrics:
+  type: tracking.MetricsDataset
+  filepath: data/09_tracking/metrics.json
+  versioned: True
