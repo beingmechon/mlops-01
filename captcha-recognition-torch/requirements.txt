@@ -16,3 +16,5 @@ torchvision
 tqdm
 matplotlib
 pillow
+fastapi
+uvicorn
